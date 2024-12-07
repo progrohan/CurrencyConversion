@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ExchangeRatesDao {
     private static final String INSERT_SQL = """
@@ -65,7 +66,7 @@ public class ExchangeRatesDao {
         return exchangeRatesList;
     }
 
-    public static ExchangeRatesModel selectById(int id) throws SQLException {
+    public static Optional<ExchangeRatesModel> selectById(int id) throws SQLException {
         ExchangeRatesModel exchangeRate = null;
         try (Connection connection = ConnectionManager.openConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID_SQL)) {
@@ -80,7 +81,7 @@ public class ExchangeRatesDao {
                 );
             }
         }
-        return exchangeRate;
+        return Optional.ofNullable(exchangeRate);
     }
 
     public static void updateExchangeRate(ExchangeRatesModel exchangeRate) throws SQLException {
