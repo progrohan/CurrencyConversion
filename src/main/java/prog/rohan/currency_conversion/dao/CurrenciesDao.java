@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CurrenciesDao {
     private static final String INSERT_SQL = """
@@ -71,7 +72,7 @@ public class CurrenciesDao {
         return currenciesList;
     }
 
-    public static CurrenciesModel selectCurrencyById(int id) {
+    public static Optional<CurrenciesModel> selectCurrencyById(int id) {
         CurrenciesModel currency = null;
         try (Connection connection = ConnectionManager.openConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID_SQL)) {
@@ -88,7 +89,7 @@ public class CurrenciesDao {
         }catch (SQLException e){
             throw new DatabaseException("Error with selecting " + id + " from database!" );
         }
-        return currency;
+        return Optional.ofNullable(currency);
     }
 
     public static void updateCurrency(CurrenciesModel currency) {
