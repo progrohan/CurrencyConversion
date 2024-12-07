@@ -1,5 +1,6 @@
 package prog.rohan.currency_conversion.dao;
 
+import prog.rohan.currency_conversion.exceptions.DatabaseException;
 import prog.rohan.currency_conversion.model.CurrenciesModel;
 import prog.rohan.currency_conversion.utils.ConnectionManager;
 
@@ -32,7 +33,7 @@ public class CurrenciesDao {
 
     public CurrenciesDao() {};
 
-    public static CurrenciesModel insertCurrency(CurrenciesModel currency) throws SQLException {
+    public static CurrenciesModel insertCurrency(CurrenciesModel currency){
         try (Connection connection = ConnectionManager.openConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
             preparedStatement.setString(1, currency.getCode());
@@ -43,11 +44,13 @@ public class CurrenciesDao {
             if(generatedKeys.next()){
                 currency.setId(generatedKeys.getInt("id"));
             }
-            return currency;
+        }catch (SQLException e){
+            throw new DatabaseException("Error with adding " + currency.getCode() + " to database!" );
         }
+        return currency;
     }
 
-    public static List<CurrenciesModel> selectCurrencies() throws SQLException {
+    public static List<CurrenciesModel> selectCurrencies(){
         List<CurrenciesModel> currenciesList = new ArrayList<>();
         CurrenciesModel currency = null;
         try (Connection connection = ConnectionManager.openConnection();
@@ -62,11 +65,13 @@ public class CurrenciesDao {
                 );
                 currenciesList.add(currency);
             }
+        }catch (SQLException e){
+            throw new DatabaseException("Error with selecting currencies from database!");
         }
         return currenciesList;
     }
 
-    public static CurrenciesModel selectCurrencyById(int id) throws SQLException {
+    public static CurrenciesModel selectCurrencyById(int id) {
         CurrenciesModel currency = null;
         try (Connection connection = ConnectionManager.openConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID_SQL)) {
@@ -80,11 +85,13 @@ public class CurrenciesDao {
                         resultSet.getString("Sign")
                 );
             }
+        }catch (SQLException e){
+            throw new DatabaseException("Error with selecting " + id + " from database!" );
         }
         return currency;
     }
 
-    public static void updateCurrency(CurrenciesModel currency) throws SQLException {
+    public static void updateCurrency(CurrenciesModel currency) {
         try (Connection connection = ConnectionManager.openConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
             preparedStatement.setString(1, currency.getCode());
@@ -92,6 +99,9 @@ public class CurrenciesDao {
             preparedStatement.setString(3, currency.getSign());
             preparedStatement.setInt(4, currency.getId());
             preparedStatement.executeUpdate();
+        }
+        catch (SQLException e){
+            throw new DatabaseException("Error with updating" + currency.getCode() + " in database!" );
         }
     }
 
