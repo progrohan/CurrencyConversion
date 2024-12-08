@@ -21,8 +21,8 @@ public class CurrenciesDao {
             SELECT *
             FROM Currencies
             """;
-    private static final String SELECT_BY_ID_SQL = SELECT_SQL
-                                                   + "\n" + "WHERE id = ?";
+    private static final String SELECT_BY_CODE_SQL = SELECT_SQL
+                                                   + "\n" + "WHERE Code = ?";
 
     private static final String UPDATE_SQL = """
             UPDATE Currencies
@@ -72,11 +72,11 @@ public class CurrenciesDao {
         return currenciesList;
     }
 
-    public static Optional<CurrenciesModel> selectCurrencyById(int id) {
+    public static Optional<CurrenciesModel> selectCurrencyByCode(String code) {
         CurrenciesModel currency = null;
         try (Connection connection = ConnectionManager.openConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID_SQL)) {
-            preparedStatement.setInt(1, id);
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_CODE_SQL)) {
+            preparedStatement.setString(1, code);
             ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()){
                 currency = new CurrenciesModel(
@@ -87,7 +87,7 @@ public class CurrenciesDao {
                 );
             }
         }catch (SQLException e){
-            throw new DatabaseException("Error with selecting " + id + " from database!" );
+            throw new DatabaseException("Error with selecting " + code + " from database!" );
         }
         return Optional.ofNullable(currency);
     }
