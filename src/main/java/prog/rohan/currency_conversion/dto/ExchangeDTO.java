@@ -3,7 +3,7 @@ package prog.rohan.currency_conversion.dto;
 public class ExchangeDTO {
     private String baseCurrencyCode;
     private String targetCurrencyCode;
-    private Integer amount;
+    private Double amount;
 
     public ExchangeDTO(String baseCurrencyCode, String targetCurrencyCode){
         this.baseCurrencyCode = baseCurrencyCode;
@@ -18,11 +18,11 @@ public class ExchangeDTO {
         return targetCurrencyCode;
     }
 
-    public int getAmount(){
+    public Double getAmount(){
         return amount;
     }
 
-    public void setAmount(int amount){
+    public void setAmount(Double amount){
         this.amount = amount;
     }
 }
