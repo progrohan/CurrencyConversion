@@ -2,20 +2,20 @@ package prog.rohan.currency_conversion.dto;
 
 public class ExchangeRateDTO {
     private Integer id;
-    private Integer baseCurrencyId;
-    private Integer targetCurrencyId;
+    private String baseCurrencyCode;
+    private String targetCurrencyCode;
     private Double rate;
 
-    public ExchangeRateDTO(int id, int baseCurrencyId, int targetCurrencyId, double rate) {
+    public ExchangeRateDTO(int id, String baseCurrencyCode, String targetCurrencyCode, double rate) {
         this.id = id;
-        this.baseCurrencyId = baseCurrencyId;
-        this.targetCurrencyId = targetCurrencyId;
+        this.baseCurrencyCode = baseCurrencyCode;
+        this.targetCurrencyCode = targetCurrencyCode;
         this.rate = rate;
     }
 
-    public ExchangeRateDTO(int baseCurrencyId, int targetCurrencyId, double rate) {
-        this.baseCurrencyId = baseCurrencyId;
-        this.targetCurrencyId = targetCurrencyId;
+    public ExchangeRateDTO(String baseCurrencyCode, String targetCurrencyCode, double rate) {
+        this.baseCurrencyCode = baseCurrencyCode;
+        this.targetCurrencyCode = targetCurrencyCode;
         this.rate = rate;
     }
 
@@ -23,12 +23,12 @@ public class ExchangeRateDTO {
         return id;
     }
 
-    public int getBaseCurrencyId() {
-        return baseCurrencyId;
+    public String getBaseCurrencyCode() {
+        return baseCurrencyCode;
     }
 
-    public int getTargetCurrencyId() {
-        return targetCurrencyId;
+    public String getTargetCurrencyCode() {
+        return targetCurrencyCode;
     }
 
     public double getRate() {
