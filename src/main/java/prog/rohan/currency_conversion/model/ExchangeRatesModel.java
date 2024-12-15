@@ -2,14 +2,15 @@ package prog.rohan.currency_conversion.model;
 
 public class ExchangeRatesModel {
     private Integer id;
-    private Integer baseCurrencyId;
-    private Integer TargetCurrencyId;
+    private String baseCurrencyCode;
+    private String TargetCurrencyCode;
     private Double rate;
 
-    public ExchangeRatesModel(Integer id, Integer baseCurrencyId, Integer targetCurrencyId, Double rate) {
+    public ExchangeRatesModel(Integer id, String baseCurrencyCode,
+                              String targetCurrencyCode, Double rate) {
         this.id = id;
-        this.baseCurrencyId = baseCurrencyId;
-        TargetCurrencyId = targetCurrencyId;
+        this.baseCurrencyCode = baseCurrencyCode;
+        this.TargetCurrencyCode = targetCurrencyCode;
         this.rate = rate;
     }
 
@@ -21,20 +22,20 @@ public class ExchangeRatesModel {
         this.id = id;
     }
 
-    public Integer getBaseCurrencyId() {
-        return baseCurrencyId;
+    public String getBaseCurrencyCode() {
+        return baseCurrencyCode;
     }
 
-    public void setBaseCurrencyId(Integer baseCurrencyId) {
-        this.baseCurrencyId = baseCurrencyId;
+    public void setBaseCurrencyCode(String baseCurrencyCode) {
+        this.baseCurrencyCode = baseCurrencyCode;
     }
 
-    public Integer getTargetCurrencyId() {
-        return TargetCurrencyId;
+    public String getTargetCurrencyCode() {
+        return TargetCurrencyCode;
     }
 
-    public void setTargetCurrencyId(Integer targetCurrencyId) {
-        TargetCurrencyId = targetCurrencyId;
+    public void setTargetCurrencyCode(String targetCurrencyCode) {
+        TargetCurrencyCode = targetCurrencyCode;
     }
 
     public Double getRate() {
@@ -49,8 +50,8 @@ public class ExchangeRatesModel {
     public String toString() {
         return "ExchangeRatesModel{" +
                "id=" + id +
-               ", baseCurrencyId=" + baseCurrencyId +
-               ", TargetCurrencyId=" + TargetCurrencyId +
+               ", baseCurrencyId=" + baseCurrencyCode +
+               ", TargetCurrencyId=" + TargetCurrencyCode +
                ", rate=" + rate +
                '}';
     }
