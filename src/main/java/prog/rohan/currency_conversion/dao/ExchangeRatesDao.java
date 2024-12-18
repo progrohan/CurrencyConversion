@@ -14,19 +14,19 @@ import java.util.Optional;
 
 public class ExchangeRatesDao {
     private static final String INSERT_SQL = """
-            INSERT INTO ExchangeRates (BaseCurrencyId, TargetCurrencyId, Rate)
-               SELECT bc.id, tc.id, ?
-               FROM Currencies AS bc, Currencies AS tc
-               WHERE bc.Code = ? AND tc.Code = ?;
+             INSERT INTO ExchangeRates(BaseCurrencyId, TargetCurrencyId, Rate)
+            VALUES ((SELECT id FROM Currencies WHERE Code = ?),
+            (SELECT id FROM Currencies WHERE Code = ?),
+            ?)
             """;
     private static final String SELECT_SQL = """
            SELECT *
            FROM ExchangeRates as er
            LEFT JOIN Currencies as bc on er.BaseCurrencyId = bc.id
            LEFT JOIN Currencies as tc on er.TargetCurrencyId = tc.id
-            """;
+           """;
 
-    private static final String SELECT_BY_CODE_SQL = """
+    private static final String SELECT_BY_CODE_SQL = SELECT_SQL + "\n" + """
            WHERE bc.Code = ? and tc.Code = ?;
            """;
 
@@ -46,7 +46,7 @@ public class ExchangeRatesDao {
             preparedStatement.executeUpdate();
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
             if(generatedKeys.next()){
-                exchangeRate.setId(generatedKeys.getInt("id"));
+                exchangeRate.setId(generatedKeys.getInt(1));
             }
         }catch (SQLException e){
             throw new DatabaseException("Error with adding " + exchangeRate.getBaseCurrencyCode()
@@ -76,18 +76,18 @@ public class ExchangeRatesDao {
         }
     }
 
-    public static Optional<ExchangeRatesModel> selectByCode(String baseCurrencyCode, String targetCurrencyCode) {
+    public static Optional<ExchangeRatesModel> selectByCode(ExchangeRatesModel exchangeRatesModel) {
         ExchangeRatesModel exchangeRate = null;
         try (Connection connection = ConnectionManager.openConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_CODE_SQL)) {
-            preparedStatement.setString(1, baseCurrencyCode);
-            preparedStatement.setString(2, targetCurrencyCode);
+            preparedStatement.setString(1, exchangeRatesModel.getBaseCurrencyCode());
+            preparedStatement.setString(2, exchangeRatesModel.getTargetCurrencyCode());
             ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()){
                 exchangeRate = new ExchangeRatesModel(
                         resultSet.getInt("id"),
-                        baseCurrencyCode,
-                        targetCurrencyCode,
+                        exchangeRatesModel.getBaseCurrencyCode(),
+                        exchangeRatesModel.getTargetCurrencyCode(),
                         resultSet.getDouble("Rate")
                 );
             }
@@ -97,14 +97,14 @@ public class ExchangeRatesDao {
         return Optional.ofNullable(exchangeRate);
     }
 
-    public static void updateExchangeRate(ExchangeRatesModel exchangeRate){
+    public static Optional<ExchangeRatesModel> updateExchangeRate(ExchangeRatesModel exchangeRate){
         try (Connection connection = ConnectionManager.openConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
             preparedStatement.setString(1, exchangeRate.getBaseCurrencyCode());
             preparedStatement.setString(2, exchangeRate.getTargetCurrencyCode());
             preparedStatement.setDouble(3, exchangeRate.getRate());
-            preparedStatement.setInt(4, exchangeRate.getId());
             preparedStatement.executeUpdate();
+            return selectByCode(exchangeRate);
         }catch (SQLException e){
             throw new DatabaseException("Error with updating " + exchangeRate.getBaseCurrencyCode()
                                         + exchangeRate.getTargetCurrencyCode() + " in database!" );
