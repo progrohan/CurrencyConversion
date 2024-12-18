@@ -14,8 +14,7 @@ public class ExchangeRateService {
     public static ExchangeRateDTO insertExchangeRates(ExchangeRateDTO exchangeRateDTO){
         ExchangeRatesModel exchangeRatesModel = new ExchangeRatesModel(null,exchangeRateDTO.getBaseCurrencyCode(),
                 exchangeRateDTO.getTargetCurrencyCode(), exchangeRateDTO.getRate());
-        Optional<ExchangeRatesModel> exchangeRateOptional = ExchangeRatesDao.selectByCode(exchangeRateDTO.getBaseCurrencyCode(),
-                exchangeRateDTO.getTargetCurrencyCode());
+        Optional<ExchangeRatesModel> exchangeRateOptional = ExchangeRatesDao.selectByCode(exchangeRatesModel);
         if(exchangeRateOptional.isPresent())
             throw new DataExistException("Exchange rate with code " +
                                          exchangeRateDTO.getBaseCurrencyCode() +
@@ -39,8 +38,11 @@ public class ExchangeRateService {
     }
 
     public static ExchangeRateDTO selectByCode(ExchangeRateDTO exchangeRateDTO){
-        Optional<ExchangeRatesModel> exchangeRatesModelOptional = ExchangeRatesDao.selectByCode(exchangeRateDTO.getBaseCurrencyCode(),
-                exchangeRateDTO.getTargetCurrencyCode());
+        ExchangeRatesModel model = new ExchangeRatesModel(null,
+                exchangeRateDTO.getBaseCurrencyCode(),
+                exchangeRateDTO.getTargetCurrencyCode(),
+                null);
+        Optional<ExchangeRatesModel> exchangeRatesModelOptional = ExchangeRatesDao.selectByCode(model);
         if(exchangeRatesModelOptional.isEmpty()) throw new DataNotFoundException("Exchange rate with code " +
                                                                          exchangeRateDTO.getBaseCurrencyCode() +
                                                                          exchangeRateDTO.getTargetCurrencyCode() +
@@ -50,9 +52,18 @@ public class ExchangeRateService {
                 exchangeRatesModel.getTargetCurrencyCode(), exchangeRatesModel.getRate());
     }
 
-    public static void updateExchangeRate(ExchangeRateDTO exchangeRateDTO){
+    public static ExchangeRateDTO updateExchangeRate(ExchangeRateDTO exchangeRateDTO){
         ExchangeRatesModel exchangeRatesModel = new ExchangeRatesModel(null,exchangeRateDTO.getBaseCurrencyCode(),
                 exchangeRateDTO.getTargetCurrencyCode(), exchangeRateDTO.getRate());
-        ExchangeRatesDao.updateExchangeRate(exchangeRatesModel);
+        Optional<ExchangeRatesModel> exchangeRatesModelOptional = ExchangeRatesDao.selectByCode(exchangeRatesModel);
+        if(exchangeRatesModelOptional.isEmpty()) throw new DataNotFoundException("Exchange rate with code " +
+                                                                                 exchangeRateDTO.getBaseCurrencyCode() +
+                                                                                 exchangeRateDTO.getTargetCurrencyCode() +
+                                                                                 " not found");
+        exchangeRatesModel= ExchangeRatesDao.updateExchangeRate(exchangeRatesModel).get();
+        return new ExchangeRateDTO(exchangeRatesModel.getId(),
+                exchangeRatesModel.getBaseCurrencyCode(),
+                exchangeRatesModel.getTargetCurrencyCode(),
+                exchangeRatesModel.getRate());
     }
 }

@@ -37,6 +37,6 @@ public class CurrencyService {
         Optional<CurrenciesModel> currencyOptional = CurrenciesDao.selectCurrencyByCode(currencyDTO.getCode());
         if (currencyOptional.isEmpty()) throw new DataNotFoundException("Currency not found");
         CurrenciesModel currency = currencyOptional.get();
-        return new CurrencyDTO(currency.getId(), currency.getCode(), currency.getFullName(), currencyDTO.getSign());
+        return new CurrencyDTO(currency.getId(), currency.getCode(), currency.getFullName(), currency.getSign());
     }
 }
