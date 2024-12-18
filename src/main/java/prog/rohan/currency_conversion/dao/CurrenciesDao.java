@@ -43,12 +43,13 @@ public class CurrenciesDao {
             preparedStatement.executeUpdate();
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
             if(generatedKeys.next()){
-                currency.setId(generatedKeys.getInt("id"));
+                currency.setId(generatedKeys.getInt(1));
             }
+            return currency;
         }catch (SQLException e){
-            throw new DatabaseException("Error with adding " + currency.getCode() + " to database!" );
+            throw new DatabaseException("Error with adding " + currency.getCode()  + " to database!");
         }
-        return currency;
+
     }
 
     public static List<CurrenciesModel> selectCurrencies(){
