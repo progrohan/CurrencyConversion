@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import prog.rohan.currency_conversion.HelloServlet;
 import prog.rohan.currency_conversion.dto.CurrencyDTO;
 import prog.rohan.currency_conversion.service.CurrencyService;
+import prog.rohan.currency_conversion.utils.DataValidator;
 
 import java.io.IOException;
 
@@ -20,6 +21,7 @@ public class CurrencyServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pathInfo = req.getPathInfo();
         String code = pathInfo.substring(1);
+        DataValidator.checkCode(code);
         CurrencyDTO currency = CurrencyService.selectCurrencyByCode(
                 new CurrencyDTO(code, null, null));
         resp.setStatus(HttpServletResponse.SC_OK);

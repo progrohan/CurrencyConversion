@@ -11,6 +11,7 @@ import prog.rohan.currency_conversion.service.CurrencyService;
 import java.io.IOException;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import prog.rohan.currency_conversion.utils.DataValidator;
 
 @WebServlet(name = "CurrenciesServlet", value = "/currencies")
 public class CurrenciesServlet extends HttpServlet {
@@ -26,8 +27,11 @@ public class CurrenciesServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String code = req.getParameter("Code");
+        DataValidator.checkCode(code);
         String fullName = req.getParameter("FullName");
+        DataValidator.checkName(fullName);
         String sign = req.getParameter("Sign");
+        DataValidator.checkSign(sign);
         CurrencyDTO currencyReqDTO = new CurrencyDTO(
                 code,
                 fullName,
