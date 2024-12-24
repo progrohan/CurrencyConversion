@@ -92,7 +92,8 @@ public class ExchangeRatesDao {
                 );
             }
         }catch (SQLException e){
-            throw new DatabaseException("Error with selecting " + baseCurrencyCode + targetCurrencyCode + " from database!" );
+            throw new DatabaseException("Error with selecting " + exchangeRate.getBaseCurrencyCode()
+                                        + exchangeRate.getTargetCurrencyCode() + " from database!" );
         }
         return Optional.ofNullable(exchangeRate);
     }
