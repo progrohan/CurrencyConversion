@@ -13,16 +13,20 @@ public class ExchangeService {
         if(rate.isEmpty()) rate = getReverseExchangeRate(exchangeDTO);
         if(rate.isEmpty()) rate = getCrossExchangeRate(exchangeDTO);
         if(rate.isEmpty()) throw new NoExchangeException("Не удалось конвертировать " +
-                                                         exchangeDTO.getBaseCurrencyCode() + " в "+
-                                                         exchangeDTO.getTargetCurrencyCode() + "!");
-        exchangeDTO.setAmount(exchangeDTO.getAmount() * rate.get());
+                                                         exchangeDTO.getBaseCurrencyDTO().getCode() + " в "+
+                                                         exchangeDTO.getTargetCurrencyDTO().getCode() + "!");
+        exchangeDTO.setRate(rate.get());
+        exchangeDTO.setConvertedAmount(exchangeDTO.getAmount() * rate.get());
         return exchangeDTO;
     }
 
     public static Optional<Double> getStraightExchangeRate(ExchangeDTO exchangeDTO){
         Double rate;
-        Optional<ExchangeRatesModel> exchangeRatesModel = ExchangeRatesDao.selectByCode(exchangeDTO.getBaseCurrencyCode(),
-                exchangeDTO.getTargetCurrencyCode());
+        Optional<ExchangeRatesModel> exchangeRatesModel = ExchangeRatesDao.selectByCode
+                (new ExchangeRatesModel(null,
+                        exchangeDTO.getBaseCurrencyDTO().getCode(),
+                        exchangeDTO.getTargetCurrencyDTO().getCode(),
+                        null));
         if(exchangeRatesModel.isPresent()){
             rate = exchangeRatesModel.get().getRate();
         }else rate = null;
@@ -31,21 +35,30 @@ public class ExchangeService {
 
     public static Optional<Double> getReverseExchangeRate(ExchangeDTO exchangeDTO){
         Double rate;
-        Optional<ExchangeRatesModel> exchangeRatesModel = ExchangeRatesDao.selectByCode(exchangeDTO.getTargetCurrencyCode(),
-                exchangeDTO.getBaseCurrencyCode());
+        Optional<ExchangeRatesModel> exchangeRatesModel = ExchangeRatesDao.selectByCode
+                (new ExchangeRatesModel(null,
+                        exchangeDTO.getTargetCurrencyDTO().getCode(),
+                        exchangeDTO.getBaseCurrencyDTO().getCode(),
+                        null));
         if(exchangeRatesModel.isPresent()){
-            rate = exchangeRatesModel.get().getRate();
+            rate = 1 / exchangeRatesModel.get().getRate();
         }else rate = null;
         return Optional.ofNullable(rate);
     }
     public static Optional<Double> getCrossExchangeRate(ExchangeDTO exchangeDTO){
         Double rate;
-        Optional<ExchangeRatesModel> usdToBase = ExchangeRatesDao.selectByCode("USD",
-                exchangeDTO.getBaseCurrencyCode());
-        Optional<ExchangeRatesModel> usdToTarget= ExchangeRatesDao.selectByCode("USD",
-                exchangeDTO.getBaseCurrencyCode());
+        Optional<ExchangeRatesModel> usdToBase = ExchangeRatesDao.selectByCode
+                ((new ExchangeRatesModel(null,
+                        "USD",
+                        exchangeDTO.getBaseCurrencyDTO().getCode(),
+                        null)));
+        Optional<ExchangeRatesModel> usdToTarget= ExchangeRatesDao.selectByCode
+                (new ExchangeRatesModel(null,
+                        "USD",
+                        exchangeDTO.getTargetCurrencyDTO().getCode(),
+                        null));
         if(usdToTarget.isEmpty() || usdToBase.isEmpty()) return Optional.empty();
-        rate = usdToBase.get().getRate() / usdToTarget.get().getRate();
+        rate = usdToTarget.get().getRate() / usdToBase.get().getRate();
         return Optional.of(rate);
     }
 }
