@@ -38,7 +38,7 @@ public class ExchangeRatesDao {
             """;
 
     public static ExchangeRatesModel insertExchangeRate(ExchangeRatesModel exchangeRate) {
-        try (Connection connection = ConnectionManager.openConnection();
+        try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
             preparedStatement.setDouble(3, exchangeRate.getRate());
             preparedStatement.setString(1, exchangeRate.getBaseCurrencyCode());
@@ -58,7 +58,7 @@ public class ExchangeRatesDao {
     public static List<ExchangeRatesModel> selectExchangeRates(){
         List<ExchangeRatesModel> exchangeRatesList = new ArrayList<>();
         ExchangeRatesModel exchangeRate = null;
-        try (Connection connection = ConnectionManager.openConnection();
+        try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
@@ -78,7 +78,7 @@ public class ExchangeRatesDao {
 
     public static Optional<ExchangeRatesModel> selectByCode(ExchangeRatesModel exchangeRatesModel) {
         ExchangeRatesModel exchangeRate = null;
-        try (Connection connection = ConnectionManager.openConnection();
+        try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_CODE_SQL)) {
             preparedStatement.setString(1, exchangeRatesModel.getBaseCurrencyCode());
             preparedStatement.setString(2, exchangeRatesModel.getTargetCurrencyCode());
@@ -99,7 +99,7 @@ public class ExchangeRatesDao {
     }
 
     public static Optional<ExchangeRatesModel> updateExchangeRate(ExchangeRatesModel exchangeRate){
-        try (Connection connection = ConnectionManager.openConnection();
+        try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
             preparedStatement.setString(1, exchangeRate.getBaseCurrencyCode());
             preparedStatement.setString(2, exchangeRate.getTargetCurrencyCode());

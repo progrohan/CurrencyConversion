@@ -35,7 +35,7 @@ public class CurrenciesDao {
     public CurrenciesDao() {};
 
     public static CurrenciesModel insertCurrency(CurrenciesModel currency){
-        try (Connection connection = ConnectionManager.openConnection();
+        try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
             preparedStatement.setString(1, currency.getCode());
             preparedStatement.setString(2, currency.getFullName());
@@ -55,7 +55,7 @@ public class CurrenciesDao {
     public static List<CurrenciesModel> selectCurrencies(){
         List<CurrenciesModel> currenciesList = new ArrayList<>();
         CurrenciesModel currency = null;
-        try (Connection connection = ConnectionManager.openConnection();
+        try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
@@ -75,7 +75,7 @@ public class CurrenciesDao {
 
     public static Optional<CurrenciesModel> selectCurrencyByCode(String code) {
         CurrenciesModel currency = null;
-        try (Connection connection = ConnectionManager.openConnection();
+        try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_CODE_SQL)) {
             preparedStatement.setString(1, code);
             ResultSet resultSet = preparedStatement.executeQuery();
