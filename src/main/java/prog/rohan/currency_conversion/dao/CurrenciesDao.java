@@ -92,19 +92,4 @@ public class CurrenciesDao {
         }
         return Optional.ofNullable(currency);
     }
-
-    public static void updateCurrency(CurrenciesModel currency) {
-        try (Connection connection = ConnectionManager.openConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
-            preparedStatement.setString(1, currency.getCode());
-            preparedStatement.setString(2, currency.getFullName());
-            preparedStatement.setString(3, currency.getSign());
-            preparedStatement.setInt(4, currency.getId());
-            preparedStatement.executeUpdate();
-        }
-        catch (SQLException e){
-            throw new DatabaseException("Error with updating" + currency.getCode() + " in database!" );
-        }
-    }
-
 }
