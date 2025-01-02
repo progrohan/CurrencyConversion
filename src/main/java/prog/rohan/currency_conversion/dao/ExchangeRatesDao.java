@@ -1,7 +1,7 @@
 package prog.rohan.currency_conversion.dao;
 
 import prog.rohan.currency_conversion.exceptions.DatabaseException;
-import prog.rohan.currency_conversion.model.ExchangeRatesModel;
+import prog.rohan.currency_conversion.model.ExchangeRate;
 import prog.rohan.currency_conversion.utils.ConnectionManager;
 
 import java.sql.Connection;
@@ -37,7 +37,7 @@ public class ExchangeRatesDao {
             AND TargetCurrencyId = (SELECT id FROM Currencies WHERE Code = ?)
             """;
 
-    public static ExchangeRatesModel insertExchangeRate(ExchangeRatesModel exchangeRate) {
+    public static ExchangeRate insertExchangeRate(ExchangeRate exchangeRate) {
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
             preparedStatement.setDouble(3, exchangeRate.getRate());
@@ -55,14 +55,14 @@ public class ExchangeRatesDao {
         return exchangeRate;
     }
 
-    public static List<ExchangeRatesModel> selectExchangeRates(){
-        List<ExchangeRatesModel> exchangeRatesList = new ArrayList<>();
-        ExchangeRatesModel exchangeRate = null;
+    public static List<ExchangeRate> selectExchangeRates(){
+        List<ExchangeRate> exchangeRatesList = new ArrayList<>();
+        ExchangeRate exchangeRate = null;
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
-                exchangeRate = new ExchangeRatesModel(
+                exchangeRate = new ExchangeRate(
                         resultSet.getInt(1),
                         resultSet.getString(6),
                         resultSet.getString(10),
@@ -76,15 +76,15 @@ public class ExchangeRatesDao {
         }
     }
 
-    public static Optional<ExchangeRatesModel> selectByCode(ExchangeRatesModel exchangeRatesModel) {
-        ExchangeRatesModel exchangeRate = null;
+    public static Optional<ExchangeRate> selectByCode(ExchangeRate exchangeRatesModel) {
+        ExchangeRate exchangeRate = null;
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_CODE_SQL)) {
             preparedStatement.setString(1, exchangeRatesModel.getBaseCurrencyCode());
             preparedStatement.setString(2, exchangeRatesModel.getTargetCurrencyCode());
             ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()){
-                exchangeRate = new ExchangeRatesModel(
+                exchangeRate = new ExchangeRate(
                         resultSet.getInt("id"),
                         exchangeRatesModel.getBaseCurrencyCode(),
                         exchangeRatesModel.getTargetCurrencyCode(),
@@ -98,7 +98,7 @@ public class ExchangeRatesDao {
         return Optional.ofNullable(exchangeRate);
     }
 
-    public static Optional<ExchangeRatesModel> updateExchangeRate(ExchangeRatesModel exchangeRate){
+    public static Optional<ExchangeRate> updateExchangeRate(ExchangeRate exchangeRate){
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
             preparedStatement.setString(1, exchangeRate.getBaseCurrencyCode());

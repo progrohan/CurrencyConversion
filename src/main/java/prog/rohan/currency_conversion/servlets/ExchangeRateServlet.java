@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import prog.rohan.currency_conversion.dto.ExchangeRateDTO;
-import prog.rohan.currency_conversion.model.ExchangeRatesModel;
 import prog.rohan.currency_conversion.service.ExchangeRateService;
 import prog.rohan.currency_conversion.utils.DataValidator;
 

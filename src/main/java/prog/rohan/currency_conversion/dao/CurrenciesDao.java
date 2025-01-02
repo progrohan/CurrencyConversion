@@ -1,7 +1,7 @@
 package prog.rohan.currency_conversion.dao;
 
 import prog.rohan.currency_conversion.exceptions.DatabaseException;
-import prog.rohan.currency_conversion.model.CurrenciesModel;
+import prog.rohan.currency_conversion.model.Currency;
 import prog.rohan.currency_conversion.utils.ConnectionManager;
 
 import java.sql.Connection;
@@ -34,7 +34,7 @@ public class CurrenciesDao {
 
     public CurrenciesDao() {};
 
-    public static CurrenciesModel insertCurrency(CurrenciesModel currency){
+    public static Currency insertCurrency(Currency currency){
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
             preparedStatement.setString(1, currency.getCode());
@@ -52,14 +52,14 @@ public class CurrenciesDao {
 
     }
 
-    public static List<CurrenciesModel> selectCurrencies(){
-        List<CurrenciesModel> currenciesList = new ArrayList<>();
-        CurrenciesModel currency = null;
+    public static List<Currency> selectCurrencies(){
+        List<Currency> currenciesList = new ArrayList<>();
+        Currency currency = null;
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
-                currency = new CurrenciesModel(
+                currency = new Currency(
                         resultSet.getInt( "id"),
                         resultSet.getString("Code"),
                         resultSet.getString("FullName"),
@@ -73,14 +73,14 @@ public class CurrenciesDao {
         return currenciesList;
     }
 
-    public static Optional<CurrenciesModel> selectCurrencyByCode(String code) {
-        CurrenciesModel currency = null;
+    public static Optional<Currency> selectCurrencyByCode(String code) {
+        Currency currency = null;
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_CODE_SQL)) {
             preparedStatement.setString(1, code);
             ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()){
-                currency = new CurrenciesModel(
+                currency = new Currency(
                         resultSet.getInt( "id"),
                         resultSet.getString("Code"),
                         resultSet.getString("FullName"),

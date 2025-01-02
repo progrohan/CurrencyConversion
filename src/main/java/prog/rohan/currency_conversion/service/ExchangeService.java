@@ -3,7 +3,7 @@ package prog.rohan.currency_conversion.service;
 import prog.rohan.currency_conversion.dao.ExchangeRatesDao;
 import prog.rohan.currency_conversion.dto.ExchangeDTO;
 import prog.rohan.currency_conversion.exceptions.NoExchangeException;
-import prog.rohan.currency_conversion.model.ExchangeRatesModel;
+import prog.rohan.currency_conversion.model.ExchangeRate;
 
 import java.util.Optional;
 
@@ -22,8 +22,8 @@ public class ExchangeService {
 
     public static Optional<Double> getStraightExchangeRate(ExchangeDTO exchangeDTO){
         Double rate;
-        Optional<ExchangeRatesModel> exchangeRatesModel = ExchangeRatesDao.selectByCode
-                (new ExchangeRatesModel(null,
+        Optional<ExchangeRate> exchangeRatesModel = ExchangeRatesDao.selectByCode
+                (new ExchangeRate(null,
                         exchangeDTO.getBaseCurrencyDTO().getCode(),
                         exchangeDTO.getTargetCurrencyDTO().getCode(),
                         null));
@@ -35,8 +35,8 @@ public class ExchangeService {
 
     public static Optional<Double> getReverseExchangeRate(ExchangeDTO exchangeDTO){
         Double rate;
-        Optional<ExchangeRatesModel> exchangeRatesModel = ExchangeRatesDao.selectByCode
-                (new ExchangeRatesModel(null,
+        Optional<ExchangeRate> exchangeRatesModel = ExchangeRatesDao.selectByCode
+                (new ExchangeRate(null,
                         exchangeDTO.getTargetCurrencyDTO().getCode(),
                         exchangeDTO.getBaseCurrencyDTO().getCode(),
                         null));
@@ -47,13 +47,13 @@ public class ExchangeService {
     }
     public static Optional<Double> getCrossExchangeRate(ExchangeDTO exchangeDTO){
         Double rate;
-        Optional<ExchangeRatesModel> usdToBase = ExchangeRatesDao.selectByCode
-                ((new ExchangeRatesModel(null,
+        Optional<ExchangeRate> usdToBase = ExchangeRatesDao.selectByCode
+                ((new ExchangeRate(null,
                         "USD",
                         exchangeDTO.getBaseCurrencyDTO().getCode(),
                         null)));
-        Optional<ExchangeRatesModel> usdToTarget= ExchangeRatesDao.selectByCode
-                (new ExchangeRatesModel(null,
+        Optional<ExchangeRate> usdToTarget= ExchangeRatesDao.selectByCode
+                (new ExchangeRate(null,
                         "USD",
                         exchangeDTO.getTargetCurrencyDTO().getCode(),
                         null));

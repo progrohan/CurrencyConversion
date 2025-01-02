@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ExchangeRatesModel {
+public class ExchangeRate {
     private Integer id;
     private String baseCurrencyCode;
     private String TargetCurrencyCode;

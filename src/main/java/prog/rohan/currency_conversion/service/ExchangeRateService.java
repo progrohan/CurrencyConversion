@@ -4,7 +4,7 @@ import prog.rohan.currency_conversion.dao.ExchangeRatesDao;
 import prog.rohan.currency_conversion.dto.ExchangeRateDTO;
 import prog.rohan.currency_conversion.exceptions.DataExistException;
 import prog.rohan.currency_conversion.exceptions.DataNotFoundException;
-import prog.rohan.currency_conversion.model.ExchangeRatesModel;
+import prog.rohan.currency_conversion.model.ExchangeRate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +12,9 @@ import java.util.Optional;
 
 public class ExchangeRateService {
     public static ExchangeRateDTO insertExchangeRates(ExchangeRateDTO exchangeRateDTO){
-        ExchangeRatesModel exchangeRatesModel = new ExchangeRatesModel(null,exchangeRateDTO.getBaseCurrencyCode(),
+        ExchangeRate exchangeRatesModel = new ExchangeRate(null,exchangeRateDTO.getBaseCurrencyCode(),
                 exchangeRateDTO.getTargetCurrencyCode(), exchangeRateDTO.getRate());
-        Optional<ExchangeRatesModel> exchangeRateOptional = ExchangeRatesDao.selectByCode(exchangeRatesModel);
+        Optional<ExchangeRate> exchangeRateOptional = ExchangeRatesDao.selectByCode(exchangeRatesModel);
         if(exchangeRateOptional.isPresent())
             throw new DataExistException("Exchange rate with code " +
                                          exchangeRateDTO.getBaseCurrencyCode() +
@@ -27,8 +27,8 @@ public class ExchangeRateService {
 
     public static List<ExchangeRateDTO> selectExchangeRates() {
         List<ExchangeRateDTO> exchangeRateDTOS = new ArrayList<>();
-        List<ExchangeRatesModel> exchangeRatesModels = ExchangeRatesDao.selectExchangeRates();
-        for(ExchangeRatesModel model: exchangeRatesModels){
+        List<ExchangeRate> exchangeRatesModels = ExchangeRatesDao.selectExchangeRates();
+        for(ExchangeRate model: exchangeRatesModels){
             exchangeRateDTOS.add(new ExchangeRateDTO(model.getId(),
                     model.getBaseCurrencyCode(),
                     model.getTargetCurrencyCode(),
@@ -38,24 +38,24 @@ public class ExchangeRateService {
     }
 
     public static ExchangeRateDTO selectByCode(ExchangeRateDTO exchangeRateDTO){
-        ExchangeRatesModel model = new ExchangeRatesModel(null,
+        ExchangeRate model = new ExchangeRate(null,
                 exchangeRateDTO.getBaseCurrencyCode(),
                 exchangeRateDTO.getTargetCurrencyCode(),
                 null);
-        Optional<ExchangeRatesModel> exchangeRatesModelOptional = ExchangeRatesDao.selectByCode(model);
+        Optional<ExchangeRate> exchangeRatesModelOptional = ExchangeRatesDao.selectByCode(model);
         if(exchangeRatesModelOptional.isEmpty()) throw new DataNotFoundException("Exchange rate with code " +
                                                                          exchangeRateDTO.getBaseCurrencyCode() +
                                                                          exchangeRateDTO.getTargetCurrencyCode() +
                                                                          " not found");
-        ExchangeRatesModel exchangeRatesModel = exchangeRatesModelOptional.get();
+        ExchangeRate exchangeRatesModel = exchangeRatesModelOptional.get();
         return new ExchangeRateDTO(exchangeRatesModel.getId(), exchangeRatesModel.getBaseCurrencyCode(),
                 exchangeRatesModel.getTargetCurrencyCode(), exchangeRatesModel.getRate());
     }
 
     public static ExchangeRateDTO updateExchangeRate(ExchangeRateDTO exchangeRateDTO){
-        ExchangeRatesModel exchangeRatesModel = new ExchangeRatesModel(null,exchangeRateDTO.getBaseCurrencyCode(),
+        ExchangeRate exchangeRatesModel = new ExchangeRate(null,exchangeRateDTO.getBaseCurrencyCode(),
                 exchangeRateDTO.getTargetCurrencyCode(), exchangeRateDTO.getRate());
-        Optional<ExchangeRatesModel> exchangeRatesModelOptional = ExchangeRatesDao.selectByCode(exchangeRatesModel);
+        Optional<ExchangeRate> exchangeRatesModelOptional = ExchangeRatesDao.selectByCode(exchangeRatesModel);
         if(exchangeRatesModelOptional.isEmpty()) throw new DataNotFoundException("Exchange rate with code " +
                                                                                  exchangeRateDTO.getBaseCurrencyCode() +
                                                                                  exchangeRateDTO.getTargetCurrencyCode() +
