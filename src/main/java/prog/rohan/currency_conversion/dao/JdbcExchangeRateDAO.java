@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ExchangeRatesDao {
+public class JdbcExchangeRateDAO implements ExchangeRateDAO{
+    private static final JdbcExchangeRateDAO INSTANCE = new JdbcExchangeRateDAO();
+
     private static final String INSERT_SQL = """
              INSERT INTO ExchangeRates(BaseCurrencyId, TargetCurrencyId, Rate)
             VALUES ((SELECT id FROM Currencies WHERE Code = ?),
@@ -30,6 +32,12 @@ public class ExchangeRatesDao {
            WHERE bc.Code = ? and tc.Code = ?;
            """;
 
+    private static final String SELECT_BY_ID_SQL = """
+            SELECT *
+            FROM ExchangeRates
+            WHERE id = ?;
+            """;
+
     private static final String UPDATE_SQL = """
             UPDATE ExchangeRates
             SET Rate = ?
@@ -37,7 +45,14 @@ public class ExchangeRatesDao {
             AND TargetCurrencyId = (SELECT id FROM Currencies WHERE Code = ?)
             """;
 
-    public static ExchangeRate insertExchangeRate(ExchangeRate exchangeRate) {
+    private JdbcExchangeRateDAO(){}
+
+    public static JdbcExchangeRateDAO getINSTANCE(){
+        return INSTANCE;
+    }
+
+    @Override
+    public ExchangeRate save(ExchangeRate exchangeRate) {
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
             preparedStatement.setDouble(3, exchangeRate.getRate());
@@ -55,7 +70,8 @@ public class ExchangeRatesDao {
         return exchangeRate;
     }
 
-    public static List<ExchangeRate> selectExchangeRates(){
+    @Override
+    public List<ExchangeRate> findAll(){
         List<ExchangeRate> exchangeRatesList = new ArrayList<>();
         ExchangeRate exchangeRate = null;
         try (Connection connection = ConnectionManager.getConnection();
@@ -76,36 +92,59 @@ public class ExchangeRatesDao {
         }
     }
 
-    public static Optional<ExchangeRate> selectByCode(ExchangeRate exchangeRatesModel) {
+    @Override
+    public Optional<ExchangeRate> findByCodes(String baseCurrencyCode, String targetCurrencyCode) {
         ExchangeRate exchangeRate = null;
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_CODE_SQL)) {
-            preparedStatement.setString(1, exchangeRatesModel.getBaseCurrencyCode());
-            preparedStatement.setString(2, exchangeRatesModel.getTargetCurrencyCode());
+            preparedStatement.setString(1, baseCurrencyCode);
+            preparedStatement.setString(2, targetCurrencyCode);
             ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()){
                 exchangeRate = new ExchangeRate(
                         resultSet.getInt("id"),
-                        exchangeRatesModel.getBaseCurrencyCode(),
-                        exchangeRatesModel.getTargetCurrencyCode(),
+                        resultSet.getString("BaseCurrencyCode"),
+                        resultSet.getString("TargetCurrencyCode"),
                         resultSet.getDouble("Rate")
                 );
             }
         }catch (SQLException e){
-            throw new DatabaseException("Error with selecting " + exchangeRate.getBaseCurrencyCode()
-                                        + exchangeRate.getTargetCurrencyCode() + " from database!" );
+            throw new DatabaseException("Error with selecting " + baseCurrencyCode
+                                        + targetCurrencyCode + " from database!" );
         }
         return Optional.ofNullable(exchangeRate);
     }
 
-    public static Optional<ExchangeRate> updateExchangeRate(ExchangeRate exchangeRate){
+    @Override
+    public Optional<ExchangeRate> findByID(Integer id){
+        ExchangeRate exchangeRate = null;
+        try (Connection connection = ConnectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID_SQL)) {
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()){
+                exchangeRate = new ExchangeRate(
+                        resultSet.getInt("id"),
+                        resultSet.getString("BaseCurrencyCode"),
+                        resultSet.getString("TargetCurrencyCode"),
+                        resultSet.getDouble("Rate")
+                );
+            }
+        }catch (SQLException e){
+            throw new DatabaseException("Error with selecting exchange rate with id " + id
+                                        + " from database!" );
+        }
+        return Optional.ofNullable(exchangeRate);
+    }
+
+    public Optional<ExchangeRate> update(ExchangeRate exchangeRate){
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
             preparedStatement.setString(1, exchangeRate.getBaseCurrencyCode());
             preparedStatement.setString(2, exchangeRate.getTargetCurrencyCode());
             preparedStatement.setDouble(3, exchangeRate.getRate());
             preparedStatement.executeUpdate();
-            return selectByCode(exchangeRate);
+            return findByCodes(exchangeRate.getBaseCurrencyCode(), exchangeRate.getTargetCurrencyCode());
         }catch (SQLException e){
             throw new DatabaseException("Error with updating " + exchangeRate.getBaseCurrencyCode()
                                         + exchangeRate.getTargetCurrencyCode() + " in database!" );

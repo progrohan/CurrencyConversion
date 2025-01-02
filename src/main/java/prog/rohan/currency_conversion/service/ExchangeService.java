@@ -1,6 +1,6 @@
 package prog.rohan.currency_conversion.service;
 
-import prog.rohan.currency_conversion.dao.ExchangeRatesDao;
+import prog.rohan.currency_conversion.dao.JdbcExchangeRateDAO;
 import prog.rohan.currency_conversion.dto.ExchangeDTO;
 import prog.rohan.currency_conversion.exceptions.NoExchangeException;
 import prog.rohan.currency_conversion.model.ExchangeRate;
@@ -8,6 +8,8 @@ import prog.rohan.currency_conversion.model.ExchangeRate;
 import java.util.Optional;
 
 public class ExchangeService {
+    private static JdbcExchangeRateDAO jdbcExchangeRateDAO = JdbcExchangeRateDAO.getINSTANCE();
+
     public static ExchangeDTO makeExchange(ExchangeDTO exchangeDTO){
         Optional<Double> rate = getStraightExchangeRate(exchangeDTO);
         if(rate.isEmpty()) rate = getReverseExchangeRate(exchangeDTO);
@@ -22,11 +24,9 @@ public class ExchangeService {
 
     public static Optional<Double> getStraightExchangeRate(ExchangeDTO exchangeDTO){
         Double rate;
-        Optional<ExchangeRate> exchangeRatesModel = ExchangeRatesDao.selectByCode
-                (new ExchangeRate(null,
+        Optional<ExchangeRate> exchangeRatesModel = jdbcExchangeRateDAO.findByCodes(
                         exchangeDTO.getBaseCurrencyDTO().getCode(),
-                        exchangeDTO.getTargetCurrencyDTO().getCode(),
-                        null));
+                        exchangeDTO.getTargetCurrencyDTO().getCode());
         if(exchangeRatesModel.isPresent()){
             rate = exchangeRatesModel.get().getRate();
         }else rate = null;
@@ -35,11 +35,9 @@ public class ExchangeService {
 
     public static Optional<Double> getReverseExchangeRate(ExchangeDTO exchangeDTO){
         Double rate;
-        Optional<ExchangeRate> exchangeRatesModel = ExchangeRatesDao.selectByCode
-                (new ExchangeRate(null,
+        Optional<ExchangeRate> exchangeRatesModel = jdbcExchangeRateDAO.findByCodes(
                         exchangeDTO.getTargetCurrencyDTO().getCode(),
-                        exchangeDTO.getBaseCurrencyDTO().getCode(),
-                        null));
+                        exchangeDTO.getBaseCurrencyDTO().getCode());
         if(exchangeRatesModel.isPresent()){
             rate = 1 / exchangeRatesModel.get().getRate();
         }else rate = null;
@@ -47,16 +45,13 @@ public class ExchangeService {
     }
     public static Optional<Double> getCrossExchangeRate(ExchangeDTO exchangeDTO){
         Double rate;
-        Optional<ExchangeRate> usdToBase = ExchangeRatesDao.selectByCode
-                ((new ExchangeRate(null,
+        Optional<ExchangeRate> usdToBase = jdbcExchangeRateDAO.findByCodes(
                         "USD",
-                        exchangeDTO.getBaseCurrencyDTO().getCode(),
-                        null)));
-        Optional<ExchangeRate> usdToTarget= ExchangeRatesDao.selectByCode
-                (new ExchangeRate(null,
+                        exchangeDTO.getBaseCurrencyDTO().getCode()
+                        );
+        Optional<ExchangeRate> usdToTarget= jdbcExchangeRateDAO.findByCodes(
                         "USD",
-                        exchangeDTO.getTargetCurrencyDTO().getCode(),
-                        null));
+                        exchangeDTO.getTargetCurrencyDTO().getCode());
         if(usdToTarget.isEmpty() || usdToBase.isEmpty()) return Optional.empty();
         rate = usdToTarget.get().getRate() / usdToBase.get().getRate();
         return Optional.of(rate);
