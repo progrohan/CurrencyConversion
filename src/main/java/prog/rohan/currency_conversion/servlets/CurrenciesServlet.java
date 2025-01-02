@@ -33,6 +33,7 @@ public class CurrenciesServlet extends HttpServlet {
         String sign = req.getParameter("Sign");
         DataValidator.checkSign(sign);
         CurrencyDTO currencyReqDTO = new CurrencyDTO(
+                null,
                 code,
                 fullName,
                 sign

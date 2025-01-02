@@ -22,7 +22,7 @@ public class CurrencyServlet extends HttpServlet {
         String code = pathInfo.substring(1);
         DataValidator.checkCode(code);
         CurrencyDTO currency = CurrencyService.selectCurrencyByCode(
-                new CurrencyDTO(code, null, null));
+                new CurrencyDTO(null,code, null, null));
         resp.setStatus(HttpServletResponse.SC_OK);
         objectMapper.writeValue(resp.getWriter(), currency);
     }
