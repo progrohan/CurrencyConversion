@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CurrenciesDao {
+public class JdbcCurrencyDAO implements CurrencyDAO{
+    private static JdbcCurrencyDAO INSTANCE = new JdbcCurrencyDAO();
     private static final String INSERT_SQL = """
             INSERT INTO Currencies (Code, FullName, Sign)
             VALUES ( ?, ?, ?);
@@ -24,6 +25,9 @@ public class CurrenciesDao {
     private static final String SELECT_BY_CODE_SQL = SELECT_SQL
                                                    + "\n" + "WHERE Code = ?";
 
+    private static final String SELECT_BY_ID_SQL = SELECT_SQL
+                                                     + "\n" + "WHERE id = ?";
+
     private static final String UPDATE_SQL = """
             UPDATE Currencies
             SET Code = ?,
@@ -32,9 +36,14 @@ public class CurrenciesDao {
             WHERE id = ?
             """;
 
-    public CurrenciesDao() {};
+    private JdbcCurrencyDAO() {};
 
-    public static Currency insertCurrency(Currency currency){
+    public static JdbcCurrencyDAO getINSTANCE(){
+        return INSTANCE;
+    }
+
+    @Override
+    public Currency save(Currency currency){
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
             preparedStatement.setString(1, currency.getCode());
@@ -52,7 +61,8 @@ public class CurrenciesDao {
 
     }
 
-    public static List<Currency> selectCurrencies(){
+    @Override
+    public List<Currency> findAll(){
         List<Currency> currenciesList = new ArrayList<>();
         Currency currency = null;
         try (Connection connection = ConnectionManager.getConnection();
@@ -73,7 +83,8 @@ public class CurrenciesDao {
         return currenciesList;
     }
 
-    public static Optional<Currency> selectCurrencyByCode(String code) {
+    @Override
+    public Optional<Currency> findByCode(String code) {
         Currency currency = null;
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_CODE_SQL)) {
@@ -91,5 +102,43 @@ public class CurrenciesDao {
             throw new DatabaseException("Error with selecting " + code + " from database!" );
         }
         return Optional.ofNullable(currency);
+    }
+
+    @Override
+    public Optional<Currency> findByID(Integer id) {
+        Currency currency = null;
+        try (Connection connection = ConnectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID_SQL)) {
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()){
+                currency = new Currency(
+                        resultSet.getInt( "id"),
+                        resultSet.getString("Code"),
+                        resultSet.getString("FullName"),
+                        resultSet.getString("Sign")
+                );
+            }
+        }catch (SQLException e){
+            throw new DatabaseException("Error with selecting " + id + " from database!" );
+        }
+        return Optional.ofNullable(currency);
+    }
+
+    @Override
+    public Optional<Currency> update(Currency currency) {
+        try (Connection connection = ConnectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
+
+            preparedStatement.setString(1, currency.getCode());
+            preparedStatement.setString(2, currency.getFullName());
+            preparedStatement.setString(3, currency.getSign());
+            preparedStatement.setInt(4, currency.getId());
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to update currency '" + currency.getCode() + "' in the database");
+        }
+        return Optional.of(currency);
     }
 }

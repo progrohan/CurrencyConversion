@@ -4,7 +4,7 @@ import prog.rohan.currency_conversion.model.Currency;
 
 import java.util.Optional;
 
-public interface CurrencyDAO extends BaseDAO<Currency, Long>{
+public interface CurrencyDAO extends BaseDAO<Currency, Integer>{
 
     Optional<Currency> findByCode(String code);
 
