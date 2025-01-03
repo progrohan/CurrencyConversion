@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ExchangeRate {
     private Integer id;
-    private String baseCurrencyCode;
-    private String TargetCurrencyCode;
+    private Currency baseCurrency;
+    private Currency TargetCurrency;
     private Double rate;
 }

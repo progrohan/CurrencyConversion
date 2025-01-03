@@ -1,6 +1,7 @@
 package prog.rohan.currency_conversion.dao;
 
 import prog.rohan.currency_conversion.exceptions.DatabaseException;
+import prog.rohan.currency_conversion.model.Currency;
 import prog.rohan.currency_conversion.model.ExchangeRate;
 import prog.rohan.currency_conversion.utils.ConnectionManager;
 
@@ -56,16 +57,16 @@ public class JdbcExchangeRateDAO implements ExchangeRateDAO{
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
             preparedStatement.setDouble(3, exchangeRate.getRate());
-            preparedStatement.setString(1, exchangeRate.getBaseCurrencyCode());
-            preparedStatement.setString(2, exchangeRate.getTargetCurrencyCode());
+            preparedStatement.setString(1, exchangeRate.getBaseCurrency().getCode());
+            preparedStatement.setString(2, exchangeRate.getTargetCurrency().getCode());
             preparedStatement.executeUpdate();
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
             if(generatedKeys.next()){
                 exchangeRate.setId(generatedKeys.getInt(1));
             }
         }catch (SQLException e){
-            throw new DatabaseException("Error with adding " + exchangeRate.getBaseCurrencyCode()
-                                        +exchangeRate.getTargetCurrencyCode()+ " to database!" );
+            throw new DatabaseException("Error with adding " + exchangeRate.getBaseCurrency().getCode()
+                                        +exchangeRate.getTargetCurrency().getCode() + " to database!" );
         }
         return exchangeRate;
     }
@@ -78,12 +79,7 @@ public class JdbcExchangeRateDAO implements ExchangeRateDAO{
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_SQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
-                exchangeRate = new ExchangeRate(
-                        resultSet.getInt(1),
-                        resultSet.getString(6),
-                        resultSet.getString(10),
-                        resultSet.getDouble(4)
-                );
+                exchangeRate = getExchangeRate(resultSet);
                 exchangeRatesList.add(exchangeRate);
             }
             return exchangeRatesList;
@@ -101,12 +97,7 @@ public class JdbcExchangeRateDAO implements ExchangeRateDAO{
             preparedStatement.setString(2, targetCurrencyCode);
             ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()){
-                exchangeRate = new ExchangeRate(
-                        resultSet.getInt("id"),
-                        resultSet.getString("BaseCurrencyCode"),
-                        resultSet.getString("TargetCurrencyCode"),
-                        resultSet.getDouble("Rate")
-                );
+                exchangeRate = getExchangeRate(resultSet);
             }
         }catch (SQLException e){
             throw new DatabaseException("Error with selecting " + baseCurrencyCode
@@ -123,12 +114,7 @@ public class JdbcExchangeRateDAO implements ExchangeRateDAO{
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()){
-                exchangeRate = new ExchangeRate(
-                        resultSet.getInt("id"),
-                        resultSet.getString("BaseCurrencyCode"),
-                        resultSet.getString("TargetCurrencyCode"),
-                        resultSet.getDouble("Rate")
-                );
+                exchangeRate = getExchangeRate(resultSet);
             }
         }catch (SQLException e){
             throw new DatabaseException("Error with selecting exchange rate with id " + id
@@ -140,16 +126,37 @@ public class JdbcExchangeRateDAO implements ExchangeRateDAO{
     public Optional<ExchangeRate> update(ExchangeRate exchangeRate){
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
-            preparedStatement.setString(1, exchangeRate.getBaseCurrencyCode());
-            preparedStatement.setString(2, exchangeRate.getTargetCurrencyCode());
+            preparedStatement.setString(1, exchangeRate.getBaseCurrency().getCode());
+            preparedStatement.setString(2, exchangeRate.getTargetCurrency().getCode());
             preparedStatement.setDouble(3, exchangeRate.getRate());
             preparedStatement.executeUpdate();
-            return findByCodes(exchangeRate.getBaseCurrencyCode(), exchangeRate.getTargetCurrencyCode());
+            return findByCodes(exchangeRate.getBaseCurrency().getCode(),
+                    exchangeRate.getTargetCurrency().getCode());
         }catch (SQLException e){
-            throw new DatabaseException("Error with updating " + exchangeRate.getBaseCurrencyCode()
-                                        + exchangeRate.getTargetCurrencyCode() + " in database!" );
+            throw new DatabaseException("Error with updating "
+                                        + exchangeRate.getBaseCurrency().getCode()
+                                        + exchangeRate.getTargetCurrency().getCode()
+                                        + " in database!" );
         }
     }
 
+    private static ExchangeRate getExchangeRate(ResultSet resultSet) throws SQLException {
+        return new ExchangeRate(
+                resultSet.getInt("er.id"),
+                new Currency(
+                        resultSet.getInt("bc.id"),
+                        resultSet.getString("bc.Code"),
+                        resultSet.getString("bc.FullName"),
+                        resultSet.getString("bc.Sign")
+                ),
+                new Currency(
+                        resultSet.getInt("tc.id"),
+                        resultSet.getString("tc.Code"),
+                        resultSet.getString("tc.FullName"),
+                        resultSet.getString("tc.Sign")
+                ),
+                resultSet.getDouble("er.Rate")
+        );
+    }
 
 }
