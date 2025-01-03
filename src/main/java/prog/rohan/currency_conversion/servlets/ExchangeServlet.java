@@ -6,7 +6,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import prog.rohan.currency_conversion.dto.ExchangeDTO;
+import prog.rohan.currency_conversion.dto.ExchangeRequestDTO;
+import prog.rohan.currency_conversion.dto.ExchangeResponseDTO;
 import prog.rohan.currency_conversion.service.ExchangeService;
 import prog.rohan.currency_conversion.utils.DataValidator;
 
@@ -24,10 +25,11 @@ public class ExchangeServlet extends HttpServlet {
         DataValidator.checkCode(targetCurrencyCode);
         String amount = req.getParameter("amount");
         DataValidator.checkAmount(amount);
-        ExchangeDTO exchangeDTO = new ExchangeDTO(baseCurrencyCode,
+        ExchangeRequestDTO exchangeRequestDTO = new ExchangeRequestDTO(
+                baseCurrencyCode,
                 targetCurrencyCode,
                 Integer.valueOf(amount));
-        exchangeDTO = ExchangeService.makeExchange(exchangeDTO);
-        objectMapper.writeValue(resp.getWriter(), exchangeDTO);
+        ExchangeResponseDTO exchangeResponseDTO = ExchangeService.makeExchange(exchangeRequestDTO);
+        objectMapper.writeValue(resp.getWriter(), exchangeResponseDTO);
     }
 }
