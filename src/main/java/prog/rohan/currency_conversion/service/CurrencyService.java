@@ -1,7 +1,7 @@
 package prog.rohan.currency_conversion.service;
 
 import prog.rohan.currency_conversion.dao.JdbcCurrencyDAO;
-import prog.rohan.currency_conversion.dto.CurrencyRequestDto;
+import prog.rohan.currency_conversion.dto.CurrencyRequestDTO;
 import prog.rohan.currency_conversion.dto.CurrencyResponseDTO;
 import prog.rohan.currency_conversion.exceptions.DataExistException;
 import prog.rohan.currency_conversion.exceptions.DataNotFoundException;
@@ -15,7 +15,7 @@ import java.util.Optional;
 public class CurrencyService {
     private static JdbcCurrencyDAO jdbcCurrencyDAO = JdbcCurrencyDAO.getINSTANCE();
 
-    public static CurrencyResponseDTO insertCurrency(CurrencyRequestDto currencyDTO){
+    public static CurrencyResponseDTO insertCurrency(CurrencyRequestDTO currencyDTO){
         Currency currency = new Currency(null, currencyDTO.getCode(),
                 currencyDTO.getFullName(), currencyDTO.getSign());
         Optional<Currency> currencyOptional = jdbcCurrencyDAO.findByCode(currencyDTO.getCode());
@@ -36,7 +36,7 @@ public class CurrencyService {
         return currencyDTOList;
     }
 
-    public static CurrencyResponseDTO selectCurrencyByCode(CurrencyRequestDto currencyDTO){
+    public static CurrencyResponseDTO selectCurrencyByCode(CurrencyRequestDTO currencyDTO){
         Optional<Currency> currencyOptional = jdbcCurrencyDAO.findByCode(currencyDTO.getCode());
         if (currencyOptional.isEmpty()) throw new DataNotFoundException("Currency not found");
         Currency currency = currencyOptional.get();

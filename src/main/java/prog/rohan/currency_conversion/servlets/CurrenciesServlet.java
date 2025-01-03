@@ -5,7 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import prog.rohan.currency_conversion.dto.CurrencyRequestDto;
+import prog.rohan.currency_conversion.dto.CurrencyRequestDTO;
 import prog.rohan.currency_conversion.dto.CurrencyResponseDTO;
 import prog.rohan.currency_conversion.service.CurrencyService;
 
@@ -33,7 +33,7 @@ public class CurrenciesServlet extends HttpServlet {
         DataValidator.checkName(fullName);
         String sign = req.getParameter("Sign");
         DataValidator.checkSign(sign);
-        CurrencyRequestDto currencyReqDTO = new CurrencyRequestDto(
+        CurrencyRequestDTO currencyReqDTO = new CurrencyRequestDTO(
                 code,
                 fullName,
                 sign

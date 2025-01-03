@@ -6,7 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import prog.rohan.currency_conversion.dto.CurrencyRequestDto;
+import prog.rohan.currency_conversion.dto.CurrencyRequestDTO;
 import prog.rohan.currency_conversion.dto.CurrencyResponseDTO;
 import prog.rohan.currency_conversion.service.CurrencyService;
 import prog.rohan.currency_conversion.utils.DataValidator;
@@ -23,7 +23,7 @@ public class CurrencyServlet extends HttpServlet {
         String code = pathInfo.substring(1);
         DataValidator.checkCode(code);
         CurrencyResponseDTO currency = CurrencyService.selectCurrencyByCode(
-                new CurrencyRequestDto(code, null, null));
+                new CurrencyRequestDTO(code, null, null));
         resp.setStatus(HttpServletResponse.SC_OK);
         objectMapper.writeValue(resp.getWriter(), currency);
     }

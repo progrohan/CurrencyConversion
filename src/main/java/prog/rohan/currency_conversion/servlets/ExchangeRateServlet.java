@@ -6,7 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import prog.rohan.currency_conversion.dto.ExchangeRateDTO;
+import prog.rohan.currency_conversion.dto.ExchangeRateRequestDTO;
 import prog.rohan.currency_conversion.service.ExchangeRateService;
 import prog.rohan.currency_conversion.utils.DataValidator;
 
@@ -33,8 +33,8 @@ public class ExchangeRateServlet extends HttpServlet {
         DataValidator.checkCode(baseCurrencyCode);
         String targetCurrencyCode = params.substring(3,6);
         DataValidator.checkCode(targetCurrencyCode);
-        ExchangeRateDTO exchangeRatesDto = ExchangeRateService.selectByCode(
-                new ExchangeRateDTO(baseCurrencyCode,
+        ExchangeRateRequestDTO exchangeRatesDto = ExchangeRateService.selectByCode(
+                new ExchangeRateRequestDTO(baseCurrencyCode,
                         targetCurrencyCode,
                         null)
         );
@@ -51,7 +51,7 @@ public class ExchangeRateServlet extends HttpServlet {
         DataValidator.checkCode(targetCurrencyCode);
         String rate = req.getParameter("rate");
         DataValidator.checkRate(rate);
-        ExchangeRateDTO exchangeRateDTO = new ExchangeRateDTO(baseCurrencyCode,
+        ExchangeRateRequestDTO exchangeRateDTO = new ExchangeRateRequestDTO(baseCurrencyCode,
                 targetCurrencyCode,
                 Double.valueOf(rate));
         exchangeRateDTO = ExchangeRateService.updateExchangeRate(exchangeRateDTO);

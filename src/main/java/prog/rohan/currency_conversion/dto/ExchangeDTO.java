@@ -11,9 +11,9 @@ public class ExchangeDTO {
 
     public ExchangeDTO(String baseCurrencyCode, String targetCurrencyCode, Integer amount){
         this.baseCurrencyDTO = CurrencyService.selectCurrencyByCode
-                (new CurrencyRequestDto(baseCurrencyCode, null, null));
+                (new CurrencyRequestDTO(baseCurrencyCode, null, null));
         this.targetCurrencyDTO = CurrencyService.selectCurrencyByCode
-                (new CurrencyRequestDto(targetCurrencyCode, null, null));
+                (new CurrencyRequestDTO(targetCurrencyCode, null, null));
         this.amount = amount;
     }
 
