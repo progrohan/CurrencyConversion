@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import prog.rohan.currency_conversion.dto.ExchangeRateRequestDTO;
+import prog.rohan.currency_conversion.dto.ExchangeRateResponseDTO;
 import prog.rohan.currency_conversion.service.ExchangeRateService;
 import prog.rohan.currency_conversion.utils.DataValidator;
 
@@ -19,7 +20,7 @@ public class ExchangeRatesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<ExchangeRateRequestDTO> exchangeRateDTOS = ExchangeRateService.selectExchangeRates();
+        List<ExchangeRateResponseDTO> exchangeRateDTOS = ExchangeRateService.selectExchangeRates();
         resp.setStatus(HttpServletResponse.SC_OK);
         objectMapper.writeValue(resp.getWriter(), exchangeRateDTOS);
     }
@@ -37,7 +38,8 @@ public class ExchangeRatesServlet extends HttpServlet {
                 targetCurrencyCode,
                 Double.valueOf(rate)
                 );
-        ExchangeRateRequestDTO exchangeRateRespDTO = ExchangeRateService.insertExchangeRates(exchangeRateReqDTO);
+        ExchangeRateResponseDTO exchangeRateRespDTO = ExchangeRateService.
+                insertExchangeRates(exchangeRateReqDTO);
         resp.setStatus(HttpServletResponse.SC_CREATED);
         objectMapper.writeValue(resp.getWriter(), exchangeRateRespDTO);
     }

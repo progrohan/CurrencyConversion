@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import prog.rohan.currency_conversion.dto.ExchangeRateRequestDTO;
+import prog.rohan.currency_conversion.dto.ExchangeRateResponseDTO;
+import prog.rohan.currency_conversion.dto.ExchangeResponseDTO;
 import prog.rohan.currency_conversion.service.ExchangeRateService;
 import prog.rohan.currency_conversion.utils.DataValidator;
 
@@ -33,7 +35,7 @@ public class ExchangeRateServlet extends HttpServlet {
         DataValidator.checkCode(baseCurrencyCode);
         String targetCurrencyCode = params.substring(3,6);
         DataValidator.checkCode(targetCurrencyCode);
-        ExchangeRateRequestDTO exchangeRatesDto = ExchangeRateService.selectByCode(
+        ExchangeRateResponseDTO exchangeRatesDto = ExchangeRateService.selectByCode(
                 new ExchangeRateRequestDTO(baseCurrencyCode,
                         targetCurrencyCode,
                         null)
@@ -51,11 +53,11 @@ public class ExchangeRateServlet extends HttpServlet {
         DataValidator.checkCode(targetCurrencyCode);
         String rate = req.getParameter("rate");
         DataValidator.checkRate(rate);
-        ExchangeRateRequestDTO exchangeRateDTO = new ExchangeRateRequestDTO(baseCurrencyCode,
+        ExchangeRateRequestDTO exchangeRateRequestDTO = new ExchangeRateRequestDTO(baseCurrencyCode,
                 targetCurrencyCode,
                 Double.valueOf(rate));
-        exchangeRateDTO = ExchangeRateService.updateExchangeRate(exchangeRateDTO);
+        ExchangeRateResponseDTO exchangeRateResponseDTO = ExchangeRateService.updateExchangeRate(exchangeRateRequestDTO);
         resp.setStatus(HttpServletResponse.SC_OK);
-        objectMapper.writeValue(resp.getWriter(), exchangeRateDTO);
+        objectMapper.writeValue(resp.getWriter(), exchangeRateResponseDTO);
     }
 }
