@@ -5,7 +5,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import prog.rohan.currency_conversion.dto.CurrencyDTO;
+import prog.rohan.currency_conversion.dto.CurrencyRequestDto;
+import prog.rohan.currency_conversion.dto.CurrencyResponseDTO;
 import prog.rohan.currency_conversion.service.CurrencyService;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ public class CurrenciesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<CurrencyDTO> currencyDTOList = CurrencyService.selectCurrencies();
+        List<CurrencyResponseDTO> currencyDTOList = CurrencyService.selectCurrencies();
         resp.setStatus(HttpServletResponse.SC_OK);
         objectMapper.writeValue(resp.getWriter(), currencyDTOList);
     }
@@ -32,13 +33,12 @@ public class CurrenciesServlet extends HttpServlet {
         DataValidator.checkName(fullName);
         String sign = req.getParameter("Sign");
         DataValidator.checkSign(sign);
-        CurrencyDTO currencyReqDTO = new CurrencyDTO(
-                null,
+        CurrencyRequestDto currencyReqDTO = new CurrencyRequestDto(
                 code,
                 fullName,
                 sign
         );
-        CurrencyDTO currencyRespDTO = CurrencyService.insertCurrency(currencyReqDTO);
+        CurrencyResponseDTO currencyRespDTO = CurrencyService.insertCurrency(currencyReqDTO);
         resp.setStatus(HttpServletResponse.SC_CREATED);
         objectMapper.writeValue(resp.getWriter(), currencyRespDTO);
     }

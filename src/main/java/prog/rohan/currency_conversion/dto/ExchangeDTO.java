@@ -3,21 +3,21 @@ package prog.rohan.currency_conversion.dto;
 import prog.rohan.currency_conversion.service.CurrencyService;
 
 public class ExchangeDTO {
-    private CurrencyDTO baseCurrencyDTO;
-    private CurrencyDTO targetCurrencyDTO;
+    private CurrencyResponseDTO baseCurrencyDTO;
+    private CurrencyResponseDTO targetCurrencyDTO;
     private Double rate;
     private Integer amount;
     private Double convertedAmount;
 
     public ExchangeDTO(String baseCurrencyCode, String targetCurrencyCode, Integer amount){
         this.baseCurrencyDTO = CurrencyService.selectCurrencyByCode
-                (new CurrencyDTO(null,baseCurrencyCode, null, null));
+                (new CurrencyRequestDto(baseCurrencyCode, null, null));
         this.targetCurrencyDTO = CurrencyService.selectCurrencyByCode
-                (new CurrencyDTO(null,targetCurrencyCode, null, null));
+                (new CurrencyRequestDto(targetCurrencyCode, null, null));
         this.amount = amount;
     }
 
-    public ExchangeDTO(CurrencyDTO baseCurrencyDTO, CurrencyDTO targetCurrencyDTO, Double rate, Integer amount, Double convertedAmount) {
+    public ExchangeDTO(CurrencyResponseDTO baseCurrencyDTO, CurrencyResponseDTO targetCurrencyDTO, Double rate, Integer amount, Double convertedAmount) {
         this.baseCurrencyDTO = baseCurrencyDTO;
         this.targetCurrencyDTO = targetCurrencyDTO;
         this.rate = rate;
@@ -25,19 +25,19 @@ public class ExchangeDTO {
         this.convertedAmount = convertedAmount;
     }
 
-    public CurrencyDTO getBaseCurrencyDTO() {
+    public CurrencyResponseDTO getBaseCurrencyDTO() {
         return baseCurrencyDTO;
     }
 
-    public void setBaseCurrencyDTO(CurrencyDTO baseCurrencyDTO) {
+    public void setBaseCurrencyDTO(CurrencyResponseDTO baseCurrencyDTO) {
         this.baseCurrencyDTO = baseCurrencyDTO;
     }
 
-    public CurrencyDTO getTargetCurrencyDTO() {
+    public CurrencyResponseDTO getTargetCurrencyDTO() {
         return targetCurrencyDTO;
     }
 
-    public void setTargetCurrencyDTO(CurrencyDTO targetCurrencyDTO) {
+    public void setTargetCurrencyDTO(CurrencyResponseDTO targetCurrencyDTO) {
         this.targetCurrencyDTO = targetCurrencyDTO;
     }
 

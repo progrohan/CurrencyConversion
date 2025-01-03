@@ -1,7 +1,8 @@
 package prog.rohan.currency_conversion.service;
 
 import prog.rohan.currency_conversion.dao.JdbcCurrencyDAO;
-import prog.rohan.currency_conversion.dto.CurrencyDTO;
+import prog.rohan.currency_conversion.dto.CurrencyRequestDto;
+import prog.rohan.currency_conversion.dto.CurrencyResponseDTO;
 import prog.rohan.currency_conversion.exceptions.DataExistException;
 import prog.rohan.currency_conversion.exceptions.DataNotFoundException;
 import prog.rohan.currency_conversion.model.Currency;
@@ -14,31 +15,31 @@ import java.util.Optional;
 public class CurrencyService {
     private static JdbcCurrencyDAO jdbcCurrencyDAO = JdbcCurrencyDAO.getINSTANCE();
 
-    public static CurrencyDTO insertCurrency(CurrencyDTO currencyDTO){
+    public static CurrencyResponseDTO insertCurrency(CurrencyRequestDto currencyDTO){
         Currency currency = new Currency(null, currencyDTO.getCode(),
                 currencyDTO.getFullName(), currencyDTO.getSign());
         Optional<Currency> currencyOptional = jdbcCurrencyDAO.findByCode(currencyDTO.getCode());
         if(currencyOptional.isPresent()) throw new DataExistException("Currency with code " +
                                                                       currencyDTO.getCode() + " is already exists!");
         currency = jdbcCurrencyDAO.save(currency);
-        return new CurrencyDTO(currency.getId(), currency.getCode(),
+        return new CurrencyResponseDTO(currency.getId(), currency.getCode(),
                 currency.getFullName(), currency.getSign());
     }
 
-    public static List<CurrencyDTO> selectCurrencies(){
-        List<CurrencyDTO> currencyDTOList = new ArrayList<>();
+    public static List<CurrencyResponseDTO> selectCurrencies(){
+        List<CurrencyResponseDTO> currencyDTOList = new ArrayList<>();
         List<Currency> currenciesModelList = jdbcCurrencyDAO.findAll();
         for(Currency model: currenciesModelList){
-            currencyDTOList.add(new CurrencyDTO(model.getId(), model.getCode(),
+            currencyDTOList.add(new CurrencyResponseDTO(model.getId(), model.getCode(),
                     model.getFullName(), model.getSign()));
         }
         return currencyDTOList;
     }
 
-    public static CurrencyDTO selectCurrencyByCode(CurrencyDTO currencyDTO){
+    public static CurrencyResponseDTO selectCurrencyByCode(CurrencyRequestDto currencyDTO){
         Optional<Currency> currencyOptional = jdbcCurrencyDAO.findByCode(currencyDTO.getCode());
         if (currencyOptional.isEmpty()) throw new DataNotFoundException("Currency not found");
         Currency currency = currencyOptional.get();
-        return new CurrencyDTO(currency.getId(), currency.getCode(), currency.getFullName(), currency.getSign());
+        return new CurrencyResponseDTO(currency.getId(), currency.getCode(), currency.getFullName(), currency.getSign());
     }
 }

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class CurrencyDTO {
+public class CurrencyResponseDTO {
     private Integer id;
     private String code;
     private String fullName;
