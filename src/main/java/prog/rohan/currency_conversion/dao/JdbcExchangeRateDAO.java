@@ -23,11 +23,21 @@ public class JdbcExchangeRateDAO implements ExchangeRateDAO{
             ?)
             """;
     private static final String SELECT_SQL = """
-           SELECT *
-           FROM ExchangeRates as er
-           LEFT JOIN Currencies as bc on er.BaseCurrencyId = bc.id
-           LEFT JOIN Currencies as tc on er.TargetCurrencyId = tc.id
-           """;
+      SELECT
+        er.id AS id,
+        bc.id AS base_id,
+        bc.Code AS base_code,
+        bc.FullName AS base_name,
+        bc.Sign AS base_sign,
+        tc.id AS target_id,
+        tc.Code AS target_code,
+        tc.FullName AS target_name,
+        tc.Sign AS target_sign,
+        er.Rate AS rate
+      FROM ExchangeRates er
+      JOIN Currencies bc ON er.BaseCurrencyId = bc.id
+      JOIN Currencies tc ON er.TargetCurrencyId = tc.id
+      """;
 
     private static final String SELECT_BY_CODE_SQL = SELECT_SQL + "\n" + """
            WHERE bc.Code = ? and tc.Code = ?;
@@ -84,6 +94,7 @@ public class JdbcExchangeRateDAO implements ExchangeRateDAO{
             }
             return exchangeRatesList;
         }catch (SQLException e) {
+            String penis = "penis";
             throw new DatabaseException("Error with selecting exchange rates from database!");
         }
     }
@@ -142,20 +153,20 @@ public class JdbcExchangeRateDAO implements ExchangeRateDAO{
 
     private static ExchangeRate getExchangeRate(ResultSet resultSet) throws SQLException {
         return new ExchangeRate(
-                resultSet.getInt("er.id"),
+                resultSet.getInt("id"),
                 new Currency(
-                        resultSet.getInt("bc.id"),
-                        resultSet.getString("bc.Code"),
-                        resultSet.getString("bc.FullName"),
-                        resultSet.getString("bc.Sign")
+                        resultSet.getInt("base_id"),
+                        resultSet.getString("base_code"),
+                        resultSet.getString("base_name"),
+                        resultSet.getString("base_sign")
                 ),
                 new Currency(
-                        resultSet.getInt("tc.id"),
-                        resultSet.getString("tc.Code"),
-                        resultSet.getString("tc.FullName"),
-                        resultSet.getString("tc.Sign")
+                        resultSet.getInt("target_id"),
+                        resultSet.getString("target_code"),
+                        resultSet.getString("target_name"),
+                        resultSet.getString("target_sign")
                 ),
-                resultSet.getDouble("er.Rate")
+                resultSet.getDouble("rate")
         );
     }
 
