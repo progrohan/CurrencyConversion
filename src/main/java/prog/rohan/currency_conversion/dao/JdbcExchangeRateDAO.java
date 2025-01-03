@@ -94,7 +94,6 @@ public class JdbcExchangeRateDAO implements ExchangeRateDAO{
             }
             return exchangeRatesList;
         }catch (SQLException e) {
-            String penis = "penis";
             throw new DatabaseException("Error with selecting exchange rates from database!");
         }
     }
